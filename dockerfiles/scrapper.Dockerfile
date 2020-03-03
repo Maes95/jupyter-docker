@@ -1,7 +1,5 @@
 FROM maes95/jupyter:basic
 
-USER root
-
 RUN pip install --upgrade pip && apk add docker && apk update
 
 RUN echo "jupyter-notebook --notebook-dir=/home/notebooks --ip='0.0.0.0' --port=8888 --NotebookApp.token=\$1 --allow-root" > /home/startNotebook.sh \
@@ -14,8 +12,6 @@ RUN pip install ${PIP_PACKAGE}
 RUN jupyter serverextension enable --py nbzip --sys-prefix \
     && jupyter nbextension install --py nbzip \
     && jupyter nbextension enable --py nbzip
-
-USER jupyter
 
 # DEFAULT RUN: NO TOKEN
 CMD ["sh", "/home/startNotebook.sh"]
