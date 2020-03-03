@@ -1,11 +1,21 @@
-FROM playniuniu/jupyter-pandas
+FROM alpine:3.8
 
-WORKDIR /home/notebooks
+RUN apk update && \
+    apk add --no-cache python3 && \
+    pip3 install --upgrade --no-cache-dir pip setuptools && \
+    ln -s /usr/bin/python3 /usr/bin/python
 
-VOLUME /home/notebooks
+RUN apk add --no-cache build-base python3-dev zeromq-dev freetype-dev libpng-dev && \
+    pip install --no-cache-dir jupyter matplotlib 
+
+RUN adduser -S jupyter
+
+USER jupyter
+RUN mkdir -p /home/jupyter/notebooks
+WORKDIR /home/jupyter/notebooks
 
 # DEFAULT RUN: NO TOKEN
-CMD ["jupyter-notebook" "--notebook-dir=/home/notebooks" "--ip='0.0.0.0'" "--port=8888" "--NotebookApp.token=''" "--allow-root"]
+CMD ["jupyter-notebook","--notebook-dir=/home/jupyter/notebooks","--ip='0.0.0.0'","--NotebookApp.token=''","--port=8888"]
 
-# BUILD docker build  -t maes95/jupyter:scrapper .
-# RUN docker run -d --rm --name jupyter-scrapper -p 8888:8888 -v $PWD/notebooks/:/home/notebooks/ maes95/jupyter:scrapper
+# BUILD docker build -f dockerfiles/basic.Dockerfile -t maes95/jupyter:basic
+# RUN docker run -d --rm --name jupyter-scrapper -p 8888:8888 -v $PWD/notebooks/:/home/jupyter/notebooks/ maes95/jupyter:basic
